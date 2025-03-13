@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using DungeonExplorer;
+
 namespace DungeonExplorer
 {
     public class Location
