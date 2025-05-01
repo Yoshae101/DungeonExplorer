@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using DungeonExplorer;
 
 namespace DungeonExplorer
 {
@@ -10,15 +8,14 @@ namespace DungeonExplorer
         public string Description { get; private set; }
         public string Item { get; private set; }
 
-        public Location(string name, string description, string item)
+        public Location(string name, string description, string item) //Class For Creating POIs in Rooms
         {
             Name = name;
             Description = description;
             Item = item;
         }
 
-        // When picking up the item, return it and remove it from the location.
-        public string PickUpItem()
+        public string PickUpItem() // Allows the player to pick up items
         {
             string foundItem = Item;
             Item = null;
@@ -26,3 +23,4 @@ namespace DungeonExplorer
         }
     }
 }
+

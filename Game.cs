@@ -1,15 +1,19 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace DungeonExplorer
 {
     public class Game
     {
         private Player player;
-        private Room currentRoom;
+        private RoomOne roomOne;
+        private RoomTwo roomTwo;
+        private RoomThree roomThree;
+        private RoomFour roomFour;
+        private RoomFive roomFive;
 
         public Game()
         {
-            // Initialize player with a name and starting health.
             Console.Write("Enter your name: ");
             string playerName = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(playerName))
@@ -18,64 +22,66 @@ namespace DungeonExplorer
                 playerName = "Steve";
             }
             player = new Player(playerName, 100);
-
-            // Create the room with the provided description.
-            currentRoom = new Room(
-                "As you push open the rustic wooden doors, the air thickens. The Orcs throne glistens from the dying flame in the centre of the floor. " +
-                "The rugged red carpet underneath your feet tears as you tread into the room, the breeze from the hall follows you in giving life back to the now roaring fire. " +
-                "The room, now engulfed in a flickering light, uncovers the throne room from its dark veil ... you decide to explore the room."
-            );
+            roomOne = new RoomOne("\n You Slowly Push The Dungeon Doors Open Stumbling Down The Rocky Cavern, The Torch Lit Halls Flicker With Light\n " 
+                + " You Reach A Wooden Door Which Swings Open To The Orcs Armoury - Bloodstained Weapons Are Hung on the wall but they still flicker with light \n" 
+                + "You peer around the corner two old armour stands are idle in the room the armour looking new and polished untouched by war \n" +
+                "... You delve into the room to see whats around ..."); ;
+            roomTwo = new RoomTwo("\n You Pull Open A Door Handle, Its Rusted Iron Handle Chips In Your Hand It Opens Revealing A Cafeteria With An Orc Finishing Off His Meal \n");
+            roomThree = new RoomThree("\n You Hear Metal Clanging Through The Door You Rush Through Clutching Your Sword To See What Thw Noise Is -"
+                +"\n An Orc Drops His Tools And Grabs The Strong Sword He Has Just Finished Tempering \n");
+            roomFour = new RoomFour("The Blacksmiths Go Silent As The Flames Burn Out, A Chime Comes From A Door With A Cross On\n"+
+                "You Tap The Door With Your New Sword As It Swings Open Revealing the Orcs Church");
+            roomFive = new RoomFive("The Guard Topples Over Making A Horriffic Screach - You Hear A Massive Pound Come From The Double Doors Off to the Side \n"+
+                "You Jam The Key You Found In the Armoury Into The Lock And With A Hard Twist The Doors Swing Open Revealing The King And His Throne");
         }
 
         public void Start()
         {
-            Console.WriteLine("\nGame started...\n");
+            Console.WriteLine("\n--- Room One: The Armory ---\n");
+            Console.WriteLine(roomOne.GetDescription() + "\n");
 
-            // Display the room's description.
-            Console.WriteLine(currentRoom.GetDescription());
-            Console.WriteLine();
-
-            // Show travel options until all items have been collected.
-            while (currentRoom.HasRemainingItems())
+            while (roomOne.HasRemainingItems())
             {
-                Console.WriteLine("Where would you like to check out? Choose an option by number:");
-                currentRoom.ShowLocations();
-
-                int choice = GetUserChoice();
-                // Valid index check (user enters 1-4)
-                if (choice < 1 || choice > currentRoom.Locations.Count)
+                Console.WriteLine("Choose a location to search:");
+                roomOne.ShowLocations();
+                int choice = GetUserChoice(1, roomOne.Locations.Count);
+                var item = roomOne.PickUpItemFromLocation(choice - 1);
+                if (item != null)
                 {
-                    Console.WriteLine("Invalid option. Please choose a valid number.");
-                    continue;
+                    player.PickUpItem(item);
                 }
-
-                // Pick up the item (if available) from the chosen location.
-                string itemFound = currentRoom.PickUpItemFromLocation(choice - 1);
-                if (itemFound != null)
-                {
-                    player.PickUpItem(itemFound);
-                }
-                Console.WriteLine("\nPlayer Status:");
-                Console.WriteLine(player.GetStatus());
-                Console.WriteLine();
+                Console.WriteLine("\n" + player.GetStatus() + "\n");
             }
+            Console.WriteLine("You collected all items in Room One.\n");
 
-            Console.WriteLine("All items have been collected. You have explored every location!");
-            Console.WriteLine("Press any key to exit the game.");
-            Console.ReadKey();
+            Console.WriteLine("\n--- Room Two: Cafeteria ---\n");
+            roomTwo.Enter(player);
+            if (player.Health <= 0) return;
+
+            Console.WriteLine("\n--- Room Three: Blacksmith's Forge ---\n");
+            roomThree.Enter(player);
+            if (player.Health <= 0) return;
+
+            Console.WriteLine("\n--- Room Four: The Church ---\n");
+            roomFour.Enter(player);
+            if (player.Health <= 0) return;
+
+            Console.WriteLine("\n--- Room Five: Throne Room ---\n");
+            roomFive.Enter(player);
         }
 
-        private int GetUserChoice()
+        private int GetUserChoice(int min, int max)
         {
-            Console.Write("Option: ");
-            string input = Console.ReadLine();
-            int option;
-            if (int.TryParse(input, out option))
+            while (true)
             {
-                return option;
+                Console.Write("Option: ");
+                string input = Console.ReadLine();
+                if (int.TryParse(input, out int opt) && opt >= min && opt <= max)
+                {
+                    return opt;
+                }
+                Console.WriteLine($"Please enter a number between {min} and {max}.");
             }
-            return -1;
         }
     }
 }
-
